@@ -1190,31 +1190,31 @@ bFirstInform = 0;
                 }
                 else
                 {
-            if(tlvFileFlag == 0)
-            {
-                tlvFileFlag = 1;
-                FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
-                Tr69TlvData *object=malloc(sizeof(Tr69TlvData));
-                if (file != NULL)
-                {
-                    fread(object, sizeof(Tr69TlvData), 1, file);
-                    fclose(file);
-                }
-
-                if (object->Tr69Enable == 0)
-                {
-                    file= fopen(TR69_TLVDATA_FILE, "wb");
-                    if (file != NULL)
+                    if(tlvFileFlag == 0)
                     {
-                        fseek(file, 0, SEEK_SET);
-                        object->Tr69Enable = 1;
-                        fwrite(object, sizeof(Tr69TlvData), 1, file);
-                        fclose(file);
-                    }
+                        tlvFileFlag = 1;
+                        FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
+                        Tr69TlvData *object=malloc(sizeof(Tr69TlvData));
+                        if (file != NULL)
+                        {
+                            fread(object, sizeof(Tr69TlvData), 1, file);
+                            fclose(file);
+                        }
 
-                }
-                free(object);
-            }
+                        if (object->Tr69Enable == 0)
+                        {
+                            file= fopen(TR69_TLVDATA_FILE, "wb");
+                            if (file != NULL)
+                            {
+                                fseek(file, 0, SEEK_SET);
+                                object->Tr69Enable = 1;
+                                fwrite(object, sizeof(Tr69TlvData), 1, file);
+                                fclose(file);
+                            }
+
+                        }
+                        free(object);
+                    }
 
                     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->NotifyEvent )
                     {

@@ -320,6 +320,7 @@ void ReadTr69TlvData()
     char buff[255];
     char url[256] = "";
     Tr69TlvData *object2=malloc(sizeof(Tr69TlvData));
+    memset(object2, 0, sizeof(Tr69TlvData));
     FILE *fp_dhcp_v6 = NULL;
     FILE *fp_dhcp = NULL;
         char strBuf[2] = {0};

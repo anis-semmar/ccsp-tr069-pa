@@ -18,13 +18,13 @@
 */
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,9 +42,9 @@
 
     description:
 
-        This file implements all api functions of CCSP management server 
+        This file implements all api functions of CCSP management server
         component called by PA.
-        Since PA and management server component shares one process, 
+        Since PA and management server component shares one process,
         these api functions are different to component public apis.
 
     ---------------------------------------------------------------
@@ -57,7 +57,7 @@
 
     author:
 
-        Hui Ma 
+        Hui Ma
         Kang Quan
 
     ---------------------------------------------------------------
@@ -121,7 +121,7 @@ static pthread_t delayRebootThreadPID = 0;
 //Intel Proposed RDKB Generic Bug Fix from XB6 SDK
 #define NO_OF_RETRY 90                 /* No of times the management server will wait before giving up*/
 #endif
-#define MAX_URL_LEN 1024 
+#define MAX_URL_LEN 1024
 #define HTTP_STR "http://"
 #define HTTPS_STR "https://"
 PFN_CCSPMS_VALUECHANGE  CcspManagementServer_ValueChangeCB;
@@ -148,7 +148,7 @@ static CCSP_BOOL        s_MS_Init_Done  = FALSE;
  * Return value - none.
  */
 
-extern CCSP_VOID 
+extern CCSP_VOID
 CcspManagementServer_InitCustom
     (
         CCSP_STRING             ComponentName,
@@ -305,74 +305,74 @@ void GetConfigFrom_bbhm(int parameterID)
 
 void ReadTr69TlvData()
 {
-	int                             res;
-	char                            recordName[MAX_BUF_SIZE];
-	errno_t                         rc               = -1;
-    	int                             ind              = -1;
+    int                             res;
+    char                            recordName[MAX_BUF_SIZE];
+    errno_t                         rc               = -1;
+        int                             ind              = -1;
 
 #if defined (INTEL_PUMA7)
-	//Intel Proposed RDKB Generic Bug Fix from XB6 SDK
-	char cmd[MAX_BUF_SIZE] = {0};
-	char out[MAX_BUF_SIZE] = {0};
+    //Intel Proposed RDKB Generic Bug Fix from XB6 SDK
+    char cmd[MAX_BUF_SIZE] = {0};
+    char out[MAX_BUF_SIZE] = {0};
 #else
-	FILE *fp;
+    FILE *fp;
 #endif
-	char buff[255];
-	char url[256] = "";
-	Tr69TlvData *object2=malloc(sizeof(Tr69TlvData));
-	FILE *fp_dhcp_v6 = NULL;
-	FILE *fp_dhcp = NULL;
+    char buff[255];
+    char url[256] = "";
+    Tr69TlvData *object2=malloc(sizeof(Tr69TlvData));
+    FILE *fp_dhcp_v6 = NULL;
+    FILE *fp_dhcp = NULL;
         char strBuf[2] = {0};
         CCSP_BOOL bACSChangedURL = FALSE;
 #if !defined (INTEL_PUMA7)
-	FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
+    FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
 #else
-	//Intel Proposed RDKB Generic Bug Fix from XB6 SDK
-	FILE *file = NULL;
-	int watchdog = NO_OF_RETRY;
+    //Intel Proposed RDKB Generic Bug Fix from XB6 SDK
+    FILE *file = NULL;
+    int watchdog = NO_OF_RETRY;
 
-	do
-	{
-		sprintf(cmd, "sysevent get TLV202-status");
-		_get_shell_output(cmd, out, MAX_BUF_SIZE);
-		sleep(1);
-		watchdog--;
-	}while ((!strstr(out,"success")) && (watchdog != 0));
+    do
+    {
+        sprintf(cmd, "sysevent get TLV202-status");
+        _get_shell_output(cmd, out, MAX_BUF_SIZE);
+        sleep(1);
+        watchdog--;
+    }while ((!strstr(out,"success")) && (watchdog != 0));
 
-	if ( watchdog == 0 )
-	{
-		fprintf(stderr, "\n%s(): Ccsp_GwProvApp haven't been able to initialize TLV Data.\n", __FUNCTION__);
-	}
+    if ( watchdog == 0 )
+    {
+        fprintf(stderr, "\n%s(): Ccsp_GwProvApp haven't been able to initialize TLV Data.\n", __FUNCTION__);
+    }
 
-	file = fopen(TR69_TLVDATA_FILE, "rb");
+    file = fopen(TR69_TLVDATA_FILE, "rb");
 #endif
-	/* Change the behavior to use TLV202 as first priority. */
-	if ((file != NULL) && (object2))
-	{
-		size_t nm = fread(object2, sizeof(Tr69TlvData), 1, file);
-		fclose(file);
-		file = NULL;
+    /* Change the behavior to use TLV202 as first priority. */
+    if ((file != NULL) && (object2))
+    {
+        size_t nm = fread(object2, sizeof(Tr69TlvData), 1, file);
+        fclose(file);
+        file = NULL;
 
-		if (nm != 1)
-		{
-			/*
-			   File is corrupted or couldn't be read.
-			   Fixme: do we need to handle this case better?
-			*/
-			memset (object2, 0, sizeof(Tr69TlvData));
-		}
+        if (nm != 1)
+        {
+            /*
+               File is corrupted or couldn't be read.
+               Fixme: do we need to handle this case better?
+            */
+            memset (object2, 0, sizeof(Tr69TlvData));
+        }
 
-		AnscTraceInfo(("%s %s File is available and processing by Tr069\n", __FUNCTION__, TR69_TLVDATA_FILE ));
-		AnscTraceInfo(("**********************************************************\n"));
-		AnscTraceInfo(("%s -#- FreshBootUp: %d\n", __FUNCTION__, object2->FreshBootUp));
-		AnscTraceInfo(("%s -#- , Tr69Enable: %d\n", __FUNCTION__, object2->Tr69Enable));
-		AnscTraceInfo(("%s -#- , AcsOverRide: %d\n", __FUNCTION__, object2->AcsOverRide));
-		AnscTraceInfo(("%s -#- , EnableCWMP: %d\n", __FUNCTION__, object2->EnableCWMP));
-		AnscTraceInfo(("%s -#- , URLchanged: %d\n", __FUNCTION__, object2->URLchanged));
-		AnscTraceInfo(("%s -#- , Username: %s\n", __FUNCTION__, object2->Username));
-		AnscTraceInfo(("%s -#- , Password: %s\n", __FUNCTION__, object2->Password));
-		AnscTraceInfo(("%s -#- , URL: %s\n", __FUNCTION__, ( object2->URL[ 0 ] != '\0' ) ? object2->URL : "NULL"));
-		AnscTraceInfo(("**********************************************************\n"));
+        AnscTraceInfo(("%s %s File is available and processing by Tr069\n", __FUNCTION__, TR69_TLVDATA_FILE ));
+        AnscTraceInfo(("**********************************************************\n"));
+        AnscTraceInfo(("%s -#- FreshBootUp: %d\n", __FUNCTION__, object2->FreshBootUp));
+        AnscTraceInfo(("%s -#- , Tr69Enable: %d\n", __FUNCTION__, object2->Tr69Enable));
+        AnscTraceInfo(("%s -#- , AcsOverRide: %d\n", __FUNCTION__, object2->AcsOverRide));
+        AnscTraceInfo(("%s -#- , EnableCWMP: %d\n", __FUNCTION__, object2->EnableCWMP));
+        AnscTraceInfo(("%s -#- , URLchanged: %d\n", __FUNCTION__, object2->URLchanged));
+        AnscTraceInfo(("%s -#- , Username: %s\n", __FUNCTION__, object2->Username));
+        AnscTraceInfo(("%s -#- , Password: %s\n", __FUNCTION__, object2->Password));
+        AnscTraceInfo(("%s -#- , URL: %s\n", __FUNCTION__, ( object2->URL[ 0 ] != '\0' ) ? object2->URL : "NULL"));
+        AnscTraceInfo(("**********************************************************\n"));
 
                 snprintf(strBuf, 2, "%s", (object2->EnableCWMP) ? "1" : "0");
                 res = PSM_Set_Record_Value2
@@ -487,17 +487,17 @@ void ReadTr69TlvData()
                        return;
                 }
 
-		
 
-		// Check if it's a fresh bootup / boot after factory reset / TR69 was never enabled
-		// If TR69 was never enabled, then we will always take URL from boot config file.
-          	AnscTraceWarning(("%s -#- FreshBootUp: %d, Tr69Enable: %d\n", __FUNCTION__, object2->FreshBootUp, object2->Tr69Enable));
-		if((object2->FreshBootUp == 1) || (object2->Tr69Enable == 0))
-		{
-			AnscTraceWarning(("%s -#- Inside FreshBootUp=1 OR Tr69Enable=0 \n", __FUNCTION__));
-			AnscTraceWarning(("%s -#- ACS URL from PSM DB- %s\n", __FUNCTION__, objectInfo[ManagementServerID].parameters[ManagementServerURLID].value));
-			AnscTraceWarning(("%s -#- ACS URL from cmconfig - %s\n", __FUNCTION__, CcspManagementServer_CloneString(object2->URL)));
-			object2->FreshBootUp = 0;
+
+        // Check if it's a fresh bootup / boot after factory reset / TR69 was never enabled
+        // If TR69 was never enabled, then we will always take URL from boot config file.
+            AnscTraceWarning(("%s -#- FreshBootUp: %d, Tr69Enable: %d\n", __FUNCTION__, object2->FreshBootUp, object2->Tr69Enable));
+        if((object2->FreshBootUp == 1) || (object2->Tr69Enable == 0))
+        {
+            AnscTraceWarning(("%s -#- Inside FreshBootUp=1 OR Tr69Enable=0 \n", __FUNCTION__));
+            AnscTraceWarning(("%s -#- ACS URL from PSM DB- %s\n", __FUNCTION__, objectInfo[ManagementServerID].parameters[ManagementServerURLID].value));
+            AnscTraceWarning(("%s -#- ACS URL from cmconfig - %s\n", __FUNCTION__, CcspManagementServer_CloneString(object2->URL)));
+            object2->FreshBootUp = 0;
                         /*
                          * If ACS URL is changed by TLV202, we need to set initialContact = 1 in order to indicates
                          * that the Session was established due to a change to the ACS URL.
@@ -507,24 +507,24 @@ void ReadTr69TlvData()
                         {
                                objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(object2->URL);
                         }
-			//on Fresh bootup / boot after factory reset, if the URL is empty, set default URL value
+            //on Fresh bootup / boot after factory reset, if the URL is empty, set default URL value
                         if (object2->URL[0] == '\0')
-			{
-				#if 0
-				FILE * urlfile= fopen(TR69_DEFAULT_URL_FILE, "r");
-				if (urlfile != NULL)
-				{
-					char url[256] = "";
-					fread(url, sizeof(url), 1, urlfile);
-					fclose(urlfile);
-					strip_line(url);
-					AnscTraceWarning(("%s -#- cmconfig file doesnt have an ACS url specified, setting url from TR69_DEFAULT_URL_FILE", __FUNCTION__));
-					objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(url);
-				}
-				else
-				{
-					printf("Cannot open default url file: \"%s\"\n", TR69_DEFAULT_URL_FILE);
-				}
+            {
+                #if 0
+                FILE * urlfile= fopen(TR69_DEFAULT_URL_FILE, "r");
+                if (urlfile != NULL)
+                {
+                    char url[256] = "";
+                    fread(url, sizeof(url), 1, urlfile);
+                    fclose(urlfile);
+                    strip_line(url);
+                    AnscTraceWarning(("%s -#- cmconfig file doesnt have an ACS url specified, setting url from TR69_DEFAULT_URL_FILE", __FUNCTION__));
+                    objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(url);
+                }
+                else
+                {
+                    printf("Cannot open default url file: \"%s\"\n", TR69_DEFAULT_URL_FILE);
+                }
                 #endif
                 if (g_Tr069PaAcsDefAddr!= NULL)
                 {
@@ -535,166 +535,166 @@ void ReadTr69TlvData()
                 {
                     AnscTraceWarning(("Unable to retrieve ACS URL  \n"));
                 }
-			}
-			else
-			{
+            }
+            else
+            {
                                 if(objectInfo[ManagementServerID].parameters[ManagementServerURLID].value == '\0')
                                 {
                                       objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(object2->URL);
                                 }
-			}
-			// Here, we need to check what is the value that we got through boot config file and update TR69 PA
-			if(object2->EnableCWMP == 1)
-				objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("true");
-			else
-				objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("false");
-		}
-		// During normal boot-up check if TR69 was enabled in device anytime.
-		// If TR69 was enabled at least once URL will be already updated. 
-		// But we need to get the latest flag value from boot-config file.
-		if ((object2->FreshBootUp == 0) && (object2->Tr69Enable == 1))
-		{
+            }
+            // Here, we need to check what is the value that we got through boot config file and update TR69 PA
+            if(object2->EnableCWMP == 1)
+                objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("true");
+            else
+                objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("false");
+        }
+        // During normal boot-up check if TR69 was enabled in device anytime.
+        // If TR69 was enabled at least once URL will be already updated.
+        // But we need to get the latest flag value from boot-config file.
+        if ((object2->FreshBootUp == 0) && (object2->Tr69Enable == 1))
+        {
                         CCSP_STRING acsURL = CcspManagementServer_CloneString(object2->URL);
-			AnscTraceWarning(("%s -#-  Inside FreshBootUp=0 AND Tr69Enable=1 \n", __FUNCTION__));
-			AnscTraceWarning(("%s -#-  ACS URL from PSM DB- %s\n", __FUNCTION__, objectInfo[ManagementServerID].parameters[ManagementServerURLID].value));
-			AnscTraceWarning(("%s -#-  ACS URL from cmconfig - %s\n", __FUNCTION__, acsURL));
+            AnscTraceWarning(("%s -#-  Inside FreshBootUp=0 AND Tr69Enable=1 \n", __FUNCTION__));
+            AnscTraceWarning(("%s -#-  ACS URL from PSM DB- %s\n", __FUNCTION__, objectInfo[ManagementServerID].parameters[ManagementServerURLID].value));
+            AnscTraceWarning(("%s -#-  ACS URL from cmconfig - %s\n", __FUNCTION__, acsURL));
                         CcspManagementServer_Free(acsURL);
 
-			if (access(CCSP_MGMT_CRPWD_FILE,F_OK)!=0)
-				{
-				AnscTraceWarning(("%s -#-  %s file is missing in normal boot scenario\n", __FUNCTION__, CCSP_MGMT_CRPWD_FILE));
-                        	t2_event_d("SYS_ERROR_MissingMgmtCRPwdID", 1);
-				}
+            if (access(CCSP_MGMT_CRPWD_FILE,F_OK)!=0)
+                {
+                AnscTraceWarning(("%s -#-  %s file is missing in normal boot scenario\n", __FUNCTION__, CCSP_MGMT_CRPWD_FILE));
+                            t2_event_d("SYS_ERROR_MissingMgmtCRPwdID", 1);
+                }
 
-			/* If TR69Enabled is already enabled, then no need to read URL.
-		   	Update only EnableCWMP value to bbhm. */
-			if(object2->EnableCWMP == 1)
-			{
-				objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("true");
-			}
-			else if(object2->EnableCWMP == 0)
-			{
-				/* There are possibilities that SNMP can enable TR69. In that case, bbhm will have updated value.
-			   	We will make the TLV file in sync with the bbhm values.
-			   	In next boot-up EnableCWMP will again update value from boot-config file*/		                      
+            /* If TR69Enabled is already enabled, then no need to read URL.
+            Update only EnableCWMP value to bbhm. */
+            if(object2->EnableCWMP == 1)
+            {
+                objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("true");
+            }
+            else if(object2->EnableCWMP == 0)
+            {
+                /* There are possibilities that SNMP can enable TR69. In that case, bbhm will have updated value.
+                We will make the TLV file in sync with the bbhm values.
+                In next boot-up EnableCWMP will again update value from boot-config file*/
                                 rc = strcasecmp_s("1",strlen("1"),objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value,&ind);
                                 if ( rc != EOK || ind )
                                 {
                                     rc = strcasecmp_s("true",strlen("true"),objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value, &ind);
                                 }
-                                if ( rc == EOK && !ind ) 
+                                if ( rc == EOK && !ind )
                                 {
-                                   object2->EnableCWMP = 1; 
+                                   object2->EnableCWMP = 1;
                                 }
-			}
-		}
-
-		//Below check is needed to make sure PSM has correct ACS URL. This is required for clients that continue to use ACS url from cmconfig.
-		if(objectInfo[ManagementServerID].parameters[ManagementServerURLID].value == NULL)
-		{
-			if(object2->URL != NULL )
-			{
-				//We are here because, PSM DB doesnt have a valid ACS url but cmconfig has. In this case, setting value from cmconfig to PSM DB
-				AnscTraceWarning(("%s -#- PSM DB reported NULL ACS URL.... Setting URL from cmconfig and continue..\n", __FUNCTION__));
-				objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(object2->URL);
-				memset( recordName, 0, sizeof( recordName ) );
-				_ansc_sprintf(recordName, "%s.%sURL.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
-				res = PSM_Set_Record_Value2(bus_handle, CcspManagementServer_SubsystemPrefix, recordName, ccsp_string, object2->URL);
-
-				if(res != CCSP_SUCCESS){
-					AnscTraceWarning(("%s -#- Failed to write object2->URL <%s> into PSM!\n", __FUNCTION__, object2->URL));
-				}
-			}
-		}
-
-		/* setting cursor at begining of the file & open file in write mode */
-		file= fopen(TR69_TLVDATA_FILE, "wb");
-		if (file != NULL) 
-		{
-			fseek(file, 0, SEEK_SET);
-			/* Write the updated object2 to the file*/
-			fwrite(object2, sizeof(Tr69TlvData), 1, file);
-			free(object2);
-			fclose(file);
-			file = NULL;
-			object2 = NULL;
-		}
-	}
-	else
-	{
-        char *pValue 								 = NULL;
-		int   IsNeed2ApplySyndicationPartnerCFGValue = 1;
-		
-		AnscTraceWarning(("%s TLV data file is missing!!!\n", __FUNCTION__));
-		AnscTraceInfo(("%s %s File is not available so unable to process by Tr069\n", __FUNCTION__, TR69_TLVDATA_FILE ));
-		system("touch /tmp/.TLVmissedtoparsebytr069");
-
-		//Check whether PSM entry is there or not
-                rc = memset_s( recordName, sizeof( recordName ), 0, sizeof( recordName ) );
-                ERR_CHK(rc);
-		_ansc_sprintf(recordName, "%s.%sEnableCWMP.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
-
-        res = PSM_Get_Record_Value2( bus_handle,
-						             CcspManagementServer_SubsystemPrefix,
-						             recordName,
-						             NULL,
-						             &pValue );
-		
-        if( res == CCSP_SUCCESS )
-		{
-            AnscTraceInfo(("%s PSM_Get_Record_Value2 success %d, name=<%s> value<%s>\n", __FUNCTION__, res, recordName, ( pValue )  ?  pValue : "NULL" ));
-
-            if( NULL != pValue ) 
-			((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(pValue);
-
-			//No Need to apply since PSM entry is available for EnableCWMP param
-			IsNeed2ApplySyndicationPartnerCFGValue = 0;
+            }
         }
 
-		//Check whether we need to apply syndication config or not
-		if( IsNeed2ApplySyndicationPartnerCFGValue )
-		{
-			char buf[ 8 ] = { 0 };
+        //Below check is needed to make sure PSM has correct ACS URL. This is required for clients that continue to use ACS url from cmconfig.
+        if(objectInfo[ManagementServerID].parameters[ManagementServerURLID].value == NULL)
+        {
+            if(object2->URL != NULL )
+            {
+                //We are here because, PSM DB doesnt have a valid ACS url but cmconfig has. In this case, setting value from cmconfig to PSM DB
+                AnscTraceWarning(("%s -#- PSM DB reported NULL ACS URL.... Setting URL from cmconfig and continue..\n", __FUNCTION__));
+                objectInfo[ManagementServerID].parameters[ManagementServerURLID].value = CcspManagementServer_CloneString(object2->URL);
+                memset( recordName, 0, sizeof( recordName ) );
+                _ansc_sprintf(recordName, "%s.%sURL.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
+                res = PSM_Set_Record_Value2(bus_handle, CcspManagementServer_SubsystemPrefix, recordName, ccsp_string, object2->URL);
 
-			//Init syscfg if not already init case
-			syscfg_init( );
-			
-			//Get the Syndication_EnableCWMP value and overwrite always during boot-up when cmconfig file not available case
-			if( ( 0 == syscfg_get( NULL, "Syndication_EnableCWMP", buf, sizeof( buf )) ) && \
-				( '\0' != buf[ 0 ] ) 
-			  )
-			{
-				int Tr69EnableValue = 0;
-				
-				//Configure EnableCWMP param based on partner's default json config
+                if(res != CCSP_SUCCESS){
+                    AnscTraceWarning(("%s -#- Failed to write object2->URL <%s> into PSM!\n", __FUNCTION__, object2->URL));
+                }
+            }
+        }
+
+        /* setting cursor at begining of the file & open file in write mode */
+        file= fopen(TR69_TLVDATA_FILE, "wb");
+        if (file != NULL)
+        {
+            fseek(file, 0, SEEK_SET);
+            /* Write the updated object2 to the file*/
+            fwrite(object2, sizeof(Tr69TlvData), 1, file);
+            free(object2);
+            fclose(file);
+            file = NULL;
+            object2 = NULL;
+        }
+    }
+    else
+    {
+        char *pValue                                 = NULL;
+        int   IsNeed2ApplySyndicationPartnerCFGValue = 1;
+
+        AnscTraceWarning(("%s TLV data file is missing!!!\n", __FUNCTION__));
+        AnscTraceInfo(("%s %s File is not available so unable to process by Tr069\n", __FUNCTION__, TR69_TLVDATA_FILE ));
+        system("touch /tmp/.TLVmissedtoparsebytr069");
+
+        //Check whether PSM entry is there or not
+                rc = memset_s( recordName, sizeof( recordName ), 0, sizeof( recordName ) );
+                ERR_CHK(rc);
+        _ansc_sprintf(recordName, "%s.%sEnableCWMP.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
+
+        res = PSM_Get_Record_Value2( bus_handle,
+                                     CcspManagementServer_SubsystemPrefix,
+                                     recordName,
+                                     NULL,
+                                     &pValue );
+
+        if( res == CCSP_SUCCESS )
+        {
+            AnscTraceInfo(("%s PSM_Get_Record_Value2 success %d, name=<%s> value<%s>\n", __FUNCTION__, res, recordName, ( pValue )  ?  pValue : "NULL" ));
+
+            if( NULL != pValue )
+            ((CCSP_MESSAGE_BUS_INFO *)bus_handle)->freefunc(pValue);
+
+            //No Need to apply since PSM entry is available for EnableCWMP param
+            IsNeed2ApplySyndicationPartnerCFGValue = 0;
+        }
+
+        //Check whether we need to apply syndication config or not
+        if( IsNeed2ApplySyndicationPartnerCFGValue )
+        {
+            char buf[ 8 ] = { 0 };
+
+            //Init syscfg if not already init case
+            syscfg_init( );
+
+            //Get the Syndication_EnableCWMP value and overwrite always during boot-up when cmconfig file not available case
+            if( ( 0 == syscfg_get( NULL, "Syndication_EnableCWMP", buf, sizeof( buf )) ) && \
+                ( '\0' != buf[ 0 ] )
+              )
+            {
+                int Tr69EnableValue = 0;
+
+                //Configure EnableCWMP param based on partner's default json config
                                 rc = strcmp_s("true", strlen("true"), buf, &ind );
                                 ERR_CHK(rc);
                                 if((rc == EOK) && (ind == 0))
-				{
-					objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("1");
-					Tr69EnableValue = 1;
-				}
-				else
-				{
-					objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("0");
-					Tr69EnableValue = 0;
-				}
-			
-				AnscTraceInfo(("%s Applying Syndication EnableCWMP:%s\n", __FUNCTION__, buf ));
-				
-				//Overwrite syndication Enable CWMP value
+                {
+                    objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("1");
+                    Tr69EnableValue = 1;
+                }
+                else
+                {
+                    objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value = CcspManagementServer_CloneString("0");
+                    Tr69EnableValue = 0;
+                }
+
+                AnscTraceInfo(("%s Applying Syndication EnableCWMP:%s\n", __FUNCTION__, buf ));
+
+                //Overwrite syndication Enable CWMP value
                                 rc = memset_s( recordName, sizeof( recordName ), 0, sizeof( recordName ) );
                                 ERR_CHK(rc);
-				_ansc_sprintf(recordName, "%s.%sEnableCWMP.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
-				res = PSM_Set_Record_Value2(bus_handle, CcspManagementServer_SubsystemPrefix, recordName, ccsp_string, ( 1 == Tr69EnableValue ) ?  "1" : "0" );
-				
-				if( res != CCSP_SUCCESS )
-				{
-					AnscTraceWarning(("%s -#- Failed to write EnableCWMP <%s> into PSM!\n", __FUNCTION__, buf ));
-				}
-			}
-		}
-	}
+                _ansc_sprintf(recordName, "%s.%sEnableCWMP.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
+                res = PSM_Set_Record_Value2(bus_handle, CcspManagementServer_SubsystemPrefix, recordName, ccsp_string, ( 1 == Tr69EnableValue ) ?  "1" : "0" );
+
+                if( res != CCSP_SUCCESS )
+                {
+                    AnscTraceWarning(("%s -#- Failed to write EnableCWMP <%s> into PSM!\n", __FUNCTION__, buf ));
+                }
+            }
+        }
+    }
         /*
          * TR-069 CPE WAN Management Protocol - 3.1 ACS Discovery:
          * If both DHCPv4 and DHCPv6 options are received, the CPE MUST use the DHCPv6 option over the DHCPv4 option.
@@ -739,18 +739,18 @@ void ReadTr69TlvData()
                updateInitalContact();
                return;
         }
-	/*RDKB-7333, CID-32939, free unused resources before exit */
-	if(object2)
-	{
-		free(object2);
-	}
-	if(file)
-	{
-		fclose(file);;
-	}
+    /*RDKB-7333, CID-32939, free unused resources before exit */
+    if(object2)
+    {
+        free(object2);
+    }
+    if(file)
+    {
+        fclose(file);;
+    }
         updateInitalContact();
-	//To be deleted after testing ConnectionRequest
-	//whiteListManagementServerURL();
+    //To be deleted after testing ConnectionRequest
+    //whiteListManagementServerURL();
 }
 
 //To be deleted after testing ConnectionRequest
@@ -766,7 +766,7 @@ void whiteListManagementServerURL()
 {
   int                             res;
   char                            recordName[256];
-  
+
   CCSP_STRING pStr = objectInfo[ManagementServerID].parameters[ManagementServerURLID].value;
   fprintf(stderr,"\n  %s %d ManagementServerURL::%s::",__FUNCTION__,__LINE__,pStr);
   if(pStr && AnscSizeOfString(pStr) > 0 )
@@ -777,28 +777,28 @@ void whiteListManagementServerURL()
     if(res != CCSP_SUCCESS)
     {
       fprintf(stderr,"\n%s:%d Failed to write object2->URL <%s> into PSM  ",__FUNCTION__,__LINE__, pStr);
-      AnscTraceWarning(("%s -#- Failed to write object2->URL <%s> into PSM!\n", __FUNCTION__, pStr));      
+      AnscTraceWarning(("%s -#- Failed to write object2->URL <%s> into PSM!\n", __FUNCTION__, pStr));
     }
-    
+
     char acsAddress[MAX_URL_LEN] = {0};
-    strcpy(acsAddress, pStr);	  
+    strcpy(acsAddress, pStr);
     char *str1 = strstr(acsAddress, HTTPS_STR);
     if(str1)
     {
-      str1 += strlen(HTTPS_STR);      
+      str1 += strlen(HTTPS_STR);
     }
     else
     {
       str1 = strstr(acsAddress, HTTP_STR);
       if(str1)
       {
-	str1 += strlen(HTTP_STR);	
-      }      
+    str1 += strlen(HTTP_STR);
+      }
     }
     if (str1 == NULL)
-    {             
+    {
       fprintf(stderr,"\n  %s %d Could not parse URL ",__FUNCTION__,__LINE__);
-      return;      
+      return;
     }
     char * str1end;
     int family = AF_INET;
@@ -814,24 +814,24 @@ void whiteListManagementServerURL()
     }
     if (str1end == NULL)
     {
-      fprintf(stderr,"\n  %s %d Could not parse URL ",__FUNCTION__,__LINE__);      
-      return;      
-    }      
-    *str1end = 0;	
-    fprintf(stderr,"\n  %s %d ACS Server IP Address:%s ",__FUNCTION__,__LINE__,str1); 
-          
+      fprintf(stderr,"\n  %s %d Could not parse URL ",__FUNCTION__,__LINE__);
+      return;
+    }
+    *str1end = 0;
+    fprintf(stderr,"\n  %s %d ACS Server IP Address:%s ",__FUNCTION__,__LINE__,str1);
+
     char iptable_cmd[1024];
     sprintf(iptable_cmd, "%s -A tr69_filter -s %s -j ACCEPT\n", ((family == AF_INET) ? "iptables" : "ip6tables"), str1);
     fprintf(stderr,"\n  %s %d iptable_cmd:%s ",__FUNCTION__,__LINE__,iptable_cmd);
     system(iptable_cmd);
-    fprintf(stderr,"\n Setting ACS URL value for firewall rule setting ");	    
+    fprintf(stderr,"\n Setting ACS URL value for firewall rule setting ");
   }
   else
   {
-    fprintf(stderr,"\n Could not set ACS URL value for firewall rule ");    
+    fprintf(stderr,"\n Could not set ACS URL value for firewall rule ");
   }
 }
-#endif 
+#endif
 
 CCSP_VOID
 CcspManagementServer_Init
@@ -872,11 +872,11 @@ CcspManagementServer_Init
 
     if ( sdmXmlFilename )
     {
-        _SupportedDataModelConfigFile = CcspManagementServer_CloneString(sdmXmlFilename); 
+        _SupportedDataModelConfigFile = CcspManagementServer_CloneString(sdmXmlFilename);
     }
     else
     {
-        _SupportedDataModelConfigFile = CcspManagementServer_CloneString(_CCSP_MANAGEMENT_SERVER_DEFAULT_SDM_FILE); 
+        _SupportedDataModelConfigFile = CcspManagementServer_CloneString(_CCSP_MANAGEMENT_SERVER_DEFAULT_SDM_FILE);
     }
 
     bus_handle = hMBusHandle;
@@ -886,7 +886,7 @@ CcspManagementServer_Init
     CcspManagementServer_cpeContext = cpeContext;
     CcspManagementServer_InitDBus();
 
-    
+
     /* set callback function on Message Bus to handle systemReadySignal */
     if ( sysReadySignalCB )
     {
@@ -898,7 +898,7 @@ CcspManagementServer_Init
                 "systemReadySignal",
                 sysReadySignalCB,
                 (void*)cbContext
-            );   
+            );
     }
 
     /* set callback function on Message Bus to handle diagCompleteSignal */
@@ -910,13 +910,13 @@ CcspManagementServer_Init
             (
                 hMBusHandle,
                 "diagCompleteSignal",
-                diagCompleteSignalCB, 
+                diagCompleteSignalCB,
                 (void*)cbContext
-            );   
+            );
     }
 
     /* TODO: Retrieve IP address/MAC address/Serial Number for later use */
-	
+
     //Custom
     CcspManagementServer_InitCustom(ComponentName,
         SubsystemPrefix,
@@ -929,7 +929,7 @@ CcspManagementServer_Init
         sdmXmlFilename);
 
     /* This has to be after InitDBus since PSM needs bus_handle. */
-    CcspManagementServer_FillInObjectInfo(); 
+    CcspManagementServer_FillInObjectInfo();
     CcspManagementServer_RegisterNameSpace();
     CcspManagementServer_DiscoverComponent();
     if(pPAMComponentName && pPAMComponentPath){
@@ -943,7 +943,7 @@ CcspManagementServer_Init
     objectInfo[MemoryID].parameters[MemoryMinUsageID].value = CcspManagementServer_CloneString(str);
 
 #ifdef USE_WHITELISTED_IP
-     //By now we know the ACS URL to be used 
+     //By now we know the ACS URL to be used
     CCSP_STRING pStr = objectInfo[ManagementServerID].parameters[ManagementServerURLID].value;
     fprintf(stderr,"%s %d ManagementServerURLID:%s\n",__FUNCTION__,__LINE__,pStr);
 
@@ -958,8 +958,8 @@ CcspManagementServer_Init
     fprintf(stderr,"%s: After firewall restart continue waiting for system ready signal from CR\n", __FUNCTION__ );
 #endif
 
-	// To check and wait for system ready signal from CR to proceed further
-	waitUntilSystemReady( CcspManagementServer_cbContext );
+    // To check and wait for system ready signal from CR to proceed further
+    waitUntilSystemReady( CcspManagementServer_cbContext );
 
     //    return  (CCSP_HANDLE)bus_handle;
     return;
@@ -1022,9 +1022,9 @@ CcspManagementServer_GetBooleanValue
        }
     }
 
-    CcspTraceWarning(("Neither Parameter '%s' nor Default '%s' is valid.  Returning "" for BooleanStr!!!\n", 
+    CcspTraceWarning(("Neither Parameter '%s' nor Default '%s' is valid.  Returning "" for BooleanStr!!!\n",
                       (ParameterValue)?(ParameterValue):"",
-                      (DefaultValue)?(DefaultValue):""));    
+                      (DefaultValue)?(DefaultValue):""));
     return CcspManagementServer_CloneString("");
 }
 
@@ -1040,13 +1040,13 @@ CcspManagementServer_GetEnableCWMP
 {
    errno_t rc  = -1;
    int ind = -1;
-   
+
    rc = strcasecmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value,&ind);
    if ( rc != EOK || ind )
    {
        rc = strcasecmp_s("false",strlen("false"),objectInfo[ManagementServerID].parameters[ManagementServerEnableCWMPID].value,&ind);
    }
-   if ( rc == EOK && !ind ) 
+   if ( rc == EOK && !ind )
    {
        return FALSE;
    }
@@ -1075,7 +1075,7 @@ CcspManagementServer_GetURL
     if ( pStr && AnscSizeOfString(pStr) > 0 )
     {
         AnscTraceWarning(("%s -#- ManagementServerURLID_PSM: %s\n", __FUNCTION__, pStr));
-	t2_event_s("acs_split", pStr);				
+    t2_event_s("acs_split", pStr);
         return  CcspManagementServer_CloneString(pStr);
     }
     else
@@ -1118,14 +1118,14 @@ CcspManagementServer_GetUsername
         CCSP_STRING                 ComponentName
     )
 {
-    
+
     CCSP_STRING pUsername = objectInfo[ManagementServerID].parameters[ManagementServerUsernameID].value;
 
     if ( pUsername && AnscSizeOfString(pUsername) > 0 )
     {
         return  CcspManagementServer_CloneString(pUsername);
     }
-    else  
+    else
     {
         char        DftUsername[72] = {0};
         ULONG       ulLength        = sizeof(DftUsername) - 1;
@@ -1180,7 +1180,7 @@ CcspManagementServer_GetPassword
     {
         return  CcspManagementServer_CloneString(pStr);
     }
-    else 
+    else
     {
         char          DftPassword[72] = {0};
         ULONG         ulLength        = sizeof(DftPassword) - 1;
@@ -1218,7 +1218,7 @@ CcspManagementServer_GetPeriodicInformEnable
 {
     errno_t rc = -1;
     int ind = -1;
-    
+
     rc = strcasecmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerPeriodicInformEnableID].value,&ind);
     if ( rc != EOK || ind )
     {
@@ -1228,7 +1228,7 @@ CcspManagementServer_GetPeriodicInformEnable
     {
        return FALSE;
     }
-    else return TRUE; 
+    else return TRUE;
 }
 CCSP_STRING
 CcspManagementServer_GetPeriodicInformEnableStr
@@ -1281,7 +1281,7 @@ CcspManagementServer_GetPeriodicInformTimeStrCustom
     (
         CCSP_STRING                 ComponentName
     );
-    
+
 CCSP_STRING
 CcspManagementServer_GetPeriodicInformTimeStr
     (
@@ -1307,13 +1307,13 @@ CcspManagementServer_GetParameterKey
  * Device.ManagementServer.ParameterKey.
  * This parameter is read-only. So it can only be written by PA.
  * Return value - 0 if success.
- * 
+ *
  */
 CCSP_INT
 CcspManagementServer_SetParameterKey
     (
         CCSP_STRING                 ComponentName,
-        CCSP_STRING                 pParameterKey                    
+        CCSP_STRING                 pParameterKey
     )
 {
     /* If it is called by PA, set it directly to PSM. */
@@ -1324,14 +1324,14 @@ CcspManagementServer_SetParameterKey
         CcspManagementServer_Free((void*)objectInfo[ManagementServerID].parameters[ManagementServerParameterKeyID].value);
     }
 
-    objectInfo[ManagementServerID].parameters[ManagementServerParameterKeyID].value = 
+    objectInfo[ManagementServerID].parameters[ManagementServerParameterKeyID].value =
         CcspManagementServer_CloneString(pParameterKey);
-    
-    _ansc_sprintf(recordName, "%s.%sParameterKey.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);    
-    
+
+    _ansc_sprintf(recordName, "%s.%sParameterKey.Value", CcspManagementServer_ComponentName, objectInfo[ManagementServerID].name);
+
     CcspTraceInfo2("ms", ("Writing ParameterKey <%s> into PSM key <%s> ...\n", pParameterKey, recordName));
-    
-    res = PSM_Set_Record_Value2 
+
+    res = PSM_Set_Record_Value2
              (
                   bus_handle,
                   CcspManagementServer_SubsystemPrefix,
@@ -1339,11 +1339,11 @@ CcspManagementServer_SetParameterKey
                   ccsp_string,
                   pParameterKey
               );
-    
+
     if(res != CCSP_SUCCESS){
         CcspTraceWarning2("ms", ("Failed to write ParameterKey <%s> into PSM!\n", pParameterKey));
     }
-    
+
     return res;
 }
 
@@ -1360,12 +1360,12 @@ CcspManagementServer_GetConnectionRequestURL
 
 #ifdef _COSA_SIM_
 
-    if( !objectInfo[ManagementServerID].parameters[ManagementServerConnectionRequestURLID].value) 
+    if( !objectInfo[ManagementServerID].parameters[ManagementServerConnectionRequestURLID].value)
     {
 
         #include <sys/types.h>
         #include <ifaddrs.h>
-        #include <netinet/in.h> 
+        #include <netinet/in.h>
         #include <arpa/inet.h>
 
         char ipaddr[INET_ADDRSTRLEN] = {0}, buf[128] ={0};
@@ -1384,25 +1384,25 @@ CcspManagementServer_GetConnectionRequestURL
             }
         }
         if (ifAddrStruct!=NULL) freeifaddrs(ifAddrStruct);
-        
+
         char *ptr_url = objectInfo[ManagementServerID].parameters[ManagementServerConnectionRequestURLID].value;
         char *ptr_port = objectInfo[ManagementServerID].parameters[ManagementServerX_LGI_COM_ConnectionRequestPortID].value;
         char *ptr_path = objectInfo[ManagementServerID].parameters[ManagementServerX_CISCO_COM_ConnectionRequestURLPathID].value;
-        
+
         if(ptr_port) sprintf(buf, "http://%s:%s/", ipaddr, ptr_port);
         else         sprintf(buf, "http://%s:%d/", ipaddr, CWMP_PORT);
         if(ptr_path)
         {
-	    rc = strcat_s(buf, sizeof(buf), ptr_path);
+        rc = strcat_s(buf, sizeof(buf), ptr_path);
             ERR_CHK(rc);
-        }    
+        }
         if(ptr_url) CcspManagementServer_Free(ptr_url);
 
         objectInfo[ManagementServerID].parameters[ManagementServerConnectionRequestURLID].value = CcspManagementServer_CloneString(buf);
     }
 
     return CcspManagementServer_CloneString(objectInfo[ManagementServerID].parameters[ManagementServerConnectionRequestURLID].value);
-                                
+
 #else
 
     if(!pPAMComponentName || !pPAMComponentPath){
@@ -1438,7 +1438,7 @@ CcspManagementServer_GetFirstUpstreamIpAddress
         char pRecordName[1000] = {0};
         char *pValue = NULL;
         errno_t rc  = -1;
-        
+
         rc = strcpy_s(pRecordName, sizeof(pRecordName), CcspManagementServer_ComponentName);
         ERR_CHK(rc);
         rc = strcat_s(pRecordName, sizeof(pRecordName), ".FirstUpstreamIpAddress.Value");
@@ -1696,7 +1696,7 @@ CcspManagementServer_GetConnectionRequestUsername
     {
         return  CcspManagementServer_CloneString(pStr);
     }
-    else  
+    else
     {
         char        DftUsername[72] = {0};
         ULONG       ulLength        = sizeof(DftUsername) - 1;
@@ -1748,7 +1748,7 @@ CcspManagementServer_GetACSOverride
 {
     errno_t rc  = -1;
     int ind = -1;
-   
+
     if(objectInfo[ManagementServerID].parameters[ManagementServerACSOverrideID].value != NULL)
     {
         rc = strcasecmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerACSOverrideID].value,&ind);
@@ -1793,7 +1793,7 @@ CcspManagementServer_GetUpgradesManaged
     //    return TRUE;
     errno_t rc  = -1;
     int ind = -1;
-   
+
     rc = strcasecmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerUpgradesManagedID].value,&ind);
     if ( rc != EOK || ind )
     {
@@ -1812,7 +1812,7 @@ CcspManagementServer_GetUpgradesManagedStr
     )
 {
     /* Set as read only and only return TRUE. */
-    //    return CcspManagementServer_CloneString("true"); 
+    //    return CcspManagementServer_CloneString("true");
 
     return CcspManagementServer_GetBooleanValue(objectInfo[ManagementServerID].parameters[ManagementServerUpgradesManagedID].value, "0");
 }
@@ -1862,8 +1862,8 @@ CcspManagementServer_GetDefaultActiveNotificationThrottleStr
     )
 {
      if (objectInfo[ManagementServerID].parameters[ManagementServerDefaultActiveNotificationThrottleID].value == NULL)
-	  return CcspManagementServer_CloneString("1");
-     
+      return CcspManagementServer_CloneString("1");
+
     return CcspManagementServer_CloneString(objectInfo[ManagementServerID].parameters[ManagementServerDefaultActiveNotificationThrottleID].value);
 }
 
@@ -2082,12 +2082,12 @@ CcspManagementServer_GetNATDetected
 {
     errno_t rc  = -1;
     int ind = -1;
-     
+
     if(objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value == NULL)
     {
         return TRUE;
     }
-    
+
     rc = strcasecmp_s("0", strlen("0"), objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value, &ind);
     if ( rc != EOK || ind )
     {
@@ -2112,7 +2112,7 @@ CcspManagementServer_GetNATDetectedStr
  * Device.ManagementServer.AliasBasedAddressing
  * Return value - the parameter value
  */
-// Currently set to a permanent value of FALSE.  
+// Currently set to a permanent value of FALSE.
 CCSP_BOOL
 CcspManagementServer_GetAliasBasedAddressing
     (
@@ -2121,7 +2121,7 @@ CcspManagementServer_GetAliasBasedAddressing
 {
     errno_t rc  = -1;
     int ind = -1;
-    
+
     rc = strcasecmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerAliasBasedAddressingID].value,&ind);
     if ( rc != EOK || ind )
     {
@@ -2142,11 +2142,11 @@ CcspManagementServer_GetAliasBasedAddressingStr
     return CcspManagementServer_GetBooleanValue(objectInfo[ManagementServerID].parameters[ManagementServerAliasBasedAddressingID].value, "0");
 }
 
-/* 
+/*
  * Device.ManagementServer.ManageableDevice.{i}.
- * is not supported. So Device.ManagementServer.ManageableDeviceNumberOfEntries 
+ * is not supported. So Device.ManagementServer.ManageableDeviceNumberOfEntries
  * is not supported here.
- * 
+ *
  */
 
 /* CcspManagementServer_GetAutonomousTransferCompletePolicy_Enable is called to get
@@ -2161,7 +2161,7 @@ CcspManagementServer_GetAutonomousTransferCompletePolicy_Enable
 {
     errno_t rc  = -1;
     int ind = -1;
-    
+
     rc =strcasecmp_s("0",strlen("0"),objectInfo[AutonomousTransferCompletePolicyID].parameters[AutonomousTransferCompletePolicyEnableID].value,&ind);
     if ( rc != EOK || ind )
     {
@@ -2479,10 +2479,10 @@ CcspManagementServer_SetLogging_EnableStr
    {
     return CCSP_SUCCESS;
    }
-    if(objectInfo[LoggingID].parameters[LoggingEnableID].value) 
+    if(objectInfo[LoggingID].parameters[LoggingEnableID].value)
         CcspManagementServer_Free(objectInfo[LoggingID].parameters[LoggingEnableID].value);
     objectInfo[LoggingID].parameters[LoggingEnableID].value = NULL;
-    
+
     rc = strcasecmp_s("TRUE",strlen("TRUE"),Value,&ind);
     if ( rc != EOK || ind )
     {
@@ -2538,7 +2538,7 @@ CcspManagementServer_SetLogging_LogLevelStr
  int level = _ansc_atoi(Value);
     errno_t rc  = -1;
     int ind = -1;
-    
+
     rc = strcasecmp_s("TRUE",strlen("TRUE"),objectInfo[LoggingID].parameters[LoggingEnableID].value,&ind);
     ERR_CHK(rc);
     if((level != g_iTraceLevel) && ((!ind) && (rc == EOK)))
@@ -2598,7 +2598,7 @@ CcspManagementServer_StunBindingChanged
     ERR_CHK(rc);
 
     /* NATDetected */
-    if ( objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value ) 
+    if ( objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value )
     {
         rc = strcmp_s("0",strlen("0"),objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value,&ind);
         ERR_CHK(rc);
@@ -2608,9 +2608,9 @@ CcspManagementServer_StunBindingChanged
         }
     }
 
-    objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value = 
+    objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].value =
         CcspManagementServer_CloneString(NATDetected ? "1" : "0");
-        
+
     if ( objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].notification &&
          ((bPrevNatDetected && !NATDetected) || (!bPrevNatDetected && NATDetected) ) )
     {
@@ -2621,7 +2621,7 @@ CcspManagementServer_StunBindingChanged
         valChanged[valChangedSize].type = objectInfo[ManagementServerID].parameters[ManagementServerNATDetectedID].type;
         valChangedSize++;
     }
-    
+
     if ( pOldNatDetected )
     {
         CcspManagementServer_Free(pOldNatDetected);
@@ -2631,7 +2631,7 @@ CcspManagementServer_StunBindingChanged
     rc = strcmp_s(UdpConnReqURL,MAX_UDP_VAL,pOldUrl,&ind);
     ERR_CHK(rc);
     if ((!pOldUrl && UdpConnReqURL) || ( UdpConnReqURL &&  ((ind) && (rc == EOK))))
-    
+
     {
         if ( objectInfo[ManagementServerID].parameters[ManagementServerUDPConnectionRequestAddressID].notification )
         {
@@ -2679,4 +2679,3 @@ CcspManagementServer_StunBindingChanged
     }
 }
 #endif
-

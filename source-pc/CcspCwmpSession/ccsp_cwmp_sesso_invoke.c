@@ -19,13 +19,13 @@
 
 /**********************************************************************
    Copyright [2014] [Cisco Systems, Inc.]
- 
+
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
- 
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -158,7 +158,7 @@ CcspCwmpsoGetRpcMethods
     PCCSP_CWMP_SOAP_RESPONSE        pCwmpSoapResponse  = (PCCSP_CWMP_SOAP_RESPONSE   )NULL;
     ULONG                           ulRetryTimes       = 0;
     char                            request_id[16];
-   	PCCSP_CWMP_CFG_INTERFACE        pCcspCwmpCfgIf  = (PCCSP_CWMP_CFG_INTERFACE)pCcspCwmpCpeController->hCcspCwmpCfgIf;
+    PCCSP_CWMP_CFG_INTERFACE        pCcspCwmpCfgIf  = (PCCSP_CWMP_CFG_INTERFACE)pCcspCwmpCpeController->hCcspCwmpCfgIf;
     ULONG                           ulRpcCallTimeout= CCSP_CWMPSO_RPCCALL_TIMEOUT;
 
     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->GetCwmpRpcTimeout )
@@ -311,14 +311,14 @@ CcspCwmpsoInformCustom
     (
       PCCSP_CWMP_CFG_INTERFACE pCcspCwmpCfgIf
     );
-    
+
 extern CCSP_VOID
 CcspCwmpsoInformCustom1
     (
        PCCSP_CWMP_EVENT pCwmpEvent,
        PCCSP_CWMP_CFG_INTERFACE pCcspCwmpCfgIf
     );
-    
+
 extern ANSC_STATUS
 CcspCwmpsoInformPopulateTRInformationCustom
     (
@@ -362,21 +362,21 @@ CcspCwmpsoInform
     int                             notifAttr;
     PCCSP_CWMP_CFG_INTERFACE        pCcspCwmpCfgIf  = (PCCSP_CWMP_CFG_INTERFACE)pCcspCwmpCpeController->hCcspCwmpCfgIf;
     ULONG                           ulRpcCallTimeout= CCSP_CWMPSO_RPCCALL_TIMEOUT;
-	BOOL							bIGD				 = TRUE;
-    PSLAP_VARIABLE          		pSlapValue			 = NULL;
-    BOOL                            bInitialContact      = pCcspCwmpProcessor->GetInitialContact(pCcspCwmpProcessor); 
+    BOOL							bIGD				 = TRUE;
+    PSLAP_VARIABLE                  pSlapValue			 = NULL;
+    BOOL                            bInitialContact      = pCcspCwmpProcessor->GetInitialContact(pCcspCwmpProcessor);
 
     BOOL                            bValChange           = FALSE;
     BOOL                            bBootStrap           = FALSE;
-	static int bFirstInform = 1;
-	static char Manufacturer[100];
-	static char ManufacturerOUI[100];
-	static char ProductClass[100];
+    static int bFirstInform = 1;
+    static char Manufacturer[100];
+    static char ManufacturerOUI[100];
+    static char ProductClass[100];
     static char ProvisioningCode[100];
-	static char SerialNumber[100];
-	static char DeviceSummary[100];
-	static char HardwareVersion[100];
-	static char SoftwareVersion[100];
+    static char SerialNumber[100];
+    static char DeviceSummary[100];
+    static char HardwareVersion[100];
+    static char SoftwareVersion[100];
 
     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->GetCwmpRpcTimeout )
     {
@@ -428,7 +428,7 @@ if(bFirstInform)
             &pCwmpDeviceId->Manufacturer
         );
         if(pCwmpDeviceId->Manufacturer != NULL)
-	strcpy(Manufacturer, pCwmpDeviceId->Manufacturer);
+    strcpy(Manufacturer, pCwmpDeviceId->Manufacturer);
 
     _ansc_sprintf(paramName, "%s%s", pRootObjName, "DeviceInfo.ManufacturerOUI");
     pCcspCwmpCpeController->GetParamStringValue
@@ -438,7 +438,7 @@ if(bFirstInform)
             &pCwmpDeviceId->OUI
         );
         if(pCwmpDeviceId->OUI != NULL)
-	strcpy(ManufacturerOUI, pCwmpDeviceId->OUI);
+    strcpy(ManufacturerOUI, pCwmpDeviceId->OUI);
 
     _ansc_sprintf(paramName, "%s%s", pRootObjName, "DeviceInfo.ProductClass");
     pCcspCwmpCpeController->GetParamStringValue
@@ -448,7 +448,7 @@ if(bFirstInform)
             &pCwmpDeviceId->ProductClass
         );
         if(pCwmpDeviceId->ProductClass != NULL)
-	strcpy(ProductClass, pCwmpDeviceId->ProductClass);
+    strcpy(ProductClass, pCwmpDeviceId->ProductClass);
     _ansc_sprintf(paramName, "%s%s", pRootObjName, "DeviceInfo.SerialNumber");
     pCcspCwmpCpeController->GetParamStringValue
         (
@@ -457,8 +457,8 @@ if(bFirstInform)
             &pCwmpDeviceId->SerialNumber
         );
 
-        if(pCwmpDeviceId->SerialNumber != NULL) 
-		strcpy(SerialNumber, pCwmpDeviceId->SerialNumber);
+        if(pCwmpDeviceId->SerialNumber != NULL)
+        strcpy(SerialNumber, pCwmpDeviceId->SerialNumber);
 
     _ansc_sprintf(paramName, "%s%s", pRootObjName, "DeviceInfo.ProvisioningCode");
     pCcspCwmpCpeController->GetParamStringValue
@@ -470,22 +470,22 @@ if(bFirstInform)
         if(pCwmpDeviceId->ProvisioningCode != NULL)
         strcpy(ProvisioningCode, pCwmpDeviceId->ProvisioningCode);
 
-	if ( !pCwmpDeviceId->Manufacturer ||
+    if ( !pCwmpDeviceId->Manufacturer ||
              !pCwmpDeviceId->OUI          ||
              !pCwmpDeviceId->ProductClass ||
              !pCwmpDeviceId->ProvisioningCode ||
              !pCwmpDeviceId->SerialNumber )
-	{
-		CcspTr069PaTraceWarning(("WARNING: failed to get Manufacturer/OUI/ProductClass/SerialNumber! 'informed' may be rejected by ACS!\n"));
-	}
+    {
+        CcspTr069PaTraceWarning(("WARNING: failed to get Manufacturer/OUI/ProductClass/SerialNumber! 'informed' may be rejected by ACS!\n"));
+    }
 }
 else
 {
 
-	pCwmpDeviceId->Manufacturer = CcspManagementServer_CloneString(Manufacturer);
-	pCwmpDeviceId->OUI 			= CcspManagementServer_CloneString(ManufacturerOUI);
-	pCwmpDeviceId->ProductClass = CcspManagementServer_CloneString(ProductClass);
-	pCwmpDeviceId->SerialNumber = CcspManagementServer_CloneString(SerialNumber);
+    pCwmpDeviceId->Manufacturer = CcspManagementServer_CloneString(Manufacturer);
+    pCwmpDeviceId->OUI          = CcspManagementServer_CloneString(ManufacturerOUI);
+    pCwmpDeviceId->ProductClass = CcspManagementServer_CloneString(ProductClass);
+    pCwmpDeviceId->SerialNumber = CcspManagementServer_CloneString(SerialNumber);
     pCwmpDeviceId->ProvisioningCode = CcspManagementServer_CloneString(ProvisioningCode);
 }
 
@@ -496,14 +496,14 @@ else
     AnscGetLocalTime(pCurrentSystemTime);
     iTimeZoneOffset = AnscGetTimeZoneOffset();
 
-	CcspTr069PaTraceDebug
-		((
-			"LocalTime is %.2d:%.2d:%.2d, zone offset=%d\n",
-			pCurrentSystemTime->Hour,
-			pCurrentSystemTime->Minute,
-			pCurrentSystemTime->Second,
+    CcspTr069PaTraceDebug
+        ((
+            "LocalTime is %.2d:%.2d:%.2d, zone offset=%d\n",
+            pCurrentSystemTime->Hour,
+            pCurrentSystemTime->Minute,
+            pCurrentSystemTime->Second,
             iTimeZoneOffset
-		));
+        ));
 
 
     /*
@@ -542,7 +542,7 @@ else
         ULONG                       ulDevDMVerMajor  = 1, ulDevDMVerMinor = 0;
         BOOL                        bDevice20OrLater = FALSE;
 
-		bIGD = FALSE;
+        bIGD = FALSE;
 
         pCcspCwmpCfgIf->GetDevDataModelVer(pCcspCwmpCfgIf->hOwnerContext, &ulDevDMVerMajor, &ulDevDMVerMinor);
         bDevice20OrLater = (ulDevDMVerMajor >= 2);
@@ -581,37 +581,37 @@ else
         }
     }
 
-	/* load customized Forced Inform Parameters if configured through CWMP CFG interface */
-	if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->GetCustomForcedInformParams )
-	{
-		char*						pCFIPs;
+    /* load customized Forced Inform Parameters if configured through CWMP CFG interface */
+    if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->GetCustomForcedInformParams )
+    {
+        char*						pCFIPs;
 
-		pCFIPs = pCcspCwmpCfgIf->GetCustomForcedInformParams(pCcspCwmpCfgIf->hOwnerContext);
+        pCFIPs = pCcspCwmpCfgIf->GetCustomForcedInformParams(pCcspCwmpCfgIf->hOwnerContext);
 
-		if ( pCFIPs )
-		{
-			char*					pParamName, *pNext;
+        if ( pCFIPs )
+        {
+            char*					pParamName, *pNext;
 
-			pParamName = pCFIPs;
+            pParamName = pCFIPs;
 
-			while ( pParamName )
-			{
-				pNext = _ansc_strchr(pParamName, ',');
-				if ( pNext ) *pNext = 0;
+            while ( pParamName )
+            {
+                pNext = _ansc_strchr(pParamName, ',');
+                if ( pNext ) *pNext = 0;
 
-        		pCwmpParamValueArray[ulPresetParamCount++].Name  = CcspTr069PaCloneString(pParamName);
-				pParamName = pNext ? pNext + 1 : NULL;
-			}
+                pCwmpParamValueArray[ulPresetParamCount++].Name  = CcspTr069PaCloneString(pParamName);
+                pParamName = pNext ? pNext + 1 : NULL;
+            }
 
-			CcspTr069PaFreeMemory(pCFIPs);	
-		}
-	}
+            CcspTr069PaFreeMemory(pCFIPs);
+        }
+    }
 
     ulParamIndex = ulPresetParamCount;
 
     // for "O BOOTSTRAP", all parameters are treated as in their original values, thus all "4 VALUE CHANGE" should be suppressed.
     for( i = 0; i < pMyObject->EventCount; i ++)
-    { 
+    {
         if ( AnscEqualString(((PCCSP_CWMP_EVENT)pMyObject->EventArray[i])->EventCode, CCSP_CWMP_INFORM_EVENT_NAME_Bootstrap, TRUE) )
         {
             bBootStrap = TRUE;
@@ -644,7 +644,7 @@ else
                     CcspTr069PaTraceDebug(("CcspCwmpsoInform -- should not contain any invisible parameters.\n"));
                     continue;
                 }
-            
+
                 for ( j = 0; j < ulPresetParamCount; j++ )
                 {
                     if ( AnscEqualString
@@ -654,11 +654,11 @@ else
                             TRUE
                         ) )
                     {
-                        if ( CCSP_CWMP_NOTIFICATION_off != 
+                        if ( CCSP_CWMP_NOTIFICATION_off !=
                             pCcspCwmpProcessor->CheckParamAttrCache
                                 ( (ANSC_HANDLE)pCcspCwmpProcessor, pMyObject->ModifiedParamArray[i]) )
-                        {    
-                            // printf("<RT> CcspCwmpsoInform -- VC parameter <%s> notification is %d. \n", pMyObject->ModifiedParamArray[i], 
+                        {
+                            // printf("<RT> CcspCwmpsoInform -- VC parameter <%s> notification is %d. \n", pMyObject->ModifiedParamArray[i],
                             //    pCcspCwmpProcessor->CheckParamAttrCache( (ANSC_HANDLE)pCcspCwmpProcessor, pMyObject->ModifiedParamArray[i]));
                             bValChange = TRUE;
                         }
@@ -672,7 +672,7 @@ else
                     int                 dataType;
 
                     /* give the namespace last check to make sure the notification has been turned off */
-                    if ( CCSP_CWMP_NOTIFICATION_off == 
+                    if ( CCSP_CWMP_NOTIFICATION_off ==
                         pCcspCwmpProcessor->CheckParamAttrCache
                             ( (ANSC_HANDLE)pCcspCwmpProcessor, pMyObject->ModifiedParamArray[i]) )
                     {
@@ -680,8 +680,8 @@ else
                     }
 
                     pCwmpParamValueArray[ulParamIndex].Name = CcspTr069PaCloneString(pMyObject->ModifiedParamArray[i]);
-                
-                    dataType = 
+
+                    dataType =
                         pCcspCwmpCpeController->GetParamDataType
                             (
                                 (ANSC_HANDLE)pCcspCwmpCpeController,
@@ -721,7 +721,7 @@ else
 
     for ( i = 0; i < ulParamIndex; i++ )
     {
-        notifAttr = 
+        notifAttr =
             pCcspCwmpCpeController->GetParamNotification
                 (
                     (ANSC_HANDLE)pCcspCwmpCpeController,
@@ -744,66 +744,66 @@ else
             {
                 pValue = NULL;
 
-         	if((!strcmp("Device.ManagementServer.ConnectionRequestURL",pCwmpParamValueArray[i].Name)) ||
-		  (!strcmp("Device.ManagementServer.ParameterKey",pCwmpParamValueArray[i].Name))|| (bFirstInform == 1))
-		  {
+            if((!strcmp("Device.ManagementServer.ConnectionRequestURL",pCwmpParamValueArray[i].Name)) ||
+          (!strcmp("Device.ManagementServer.ParameterKey",pCwmpParamValueArray[i].Name))|| (bFirstInform == 1))
+          {
                      pCcspCwmpCpeController->GetParamStringValue
                      (
                         (ANSC_HANDLE)pCcspCwmpCpeController,
                         pCwmpParamValueArray[i].Name,
                         &pValue
                      );
-			if(bFirstInform == 1)
-			{
-				if(!strcmp("Device.DeviceInfo.HardwareVersion",pCwmpParamValueArray[i].Name))
-				{
+            if(bFirstInform == 1)
+            {
+                if(!strcmp("Device.DeviceInfo.HardwareVersion",pCwmpParamValueArray[i].Name))
+                {
                                         if(pValue != NULL)
-					strcpy(HardwareVersion,pValue);
-				}
-				else if(!strcmp("Device.DeviceInfo.SoftwareVersion",pCwmpParamValueArray[i].Name))
-				{
+                    strcpy(HardwareVersion,pValue);
+                }
+                else if(!strcmp("Device.DeviceInfo.SoftwareVersion",pCwmpParamValueArray[i].Name))
+                {
                                         if(pValue != NULL)
-					strcpy(SoftwareVersion,pValue);
-				}
+                    strcpy(SoftwareVersion,pValue);
+                }
                                 else if(!strcmp("Device.DeviceInfo.ProvisioningCode",pCwmpParamValueArray[i].Name))
                                 {
                                         if(pValue != NULL)
                                         strcpy(ProvisioningCode,pValue);
                                 }
-					
-			}
-	     }
+
+            }
+         }
              else
              {
-		if(!strcmp("Device.DeviceInfo.HardwareVersion",pCwmpParamValueArray[i].Name))
-		{
-			pValue = CcspManagementServer_CloneString(HardwareVersion);
-		}
-		else if(!strcmp("Device.DeviceInfo.SoftwareVersion",pCwmpParamValueArray[i].Name))
-		{
-			pValue = CcspManagementServer_CloneString(SoftwareVersion);
-		}
+        if(!strcmp("Device.DeviceInfo.HardwareVersion",pCwmpParamValueArray[i].Name))
+        {
+            pValue = CcspManagementServer_CloneString(HardwareVersion);
+        }
+        else if(!strcmp("Device.DeviceInfo.SoftwareVersion",pCwmpParamValueArray[i].Name))
+        {
+            pValue = CcspManagementServer_CloneString(SoftwareVersion);
+        }
                 else if(!strcmp("Device.DeviceInfo.ProvisioningCode",pCwmpParamValueArray[i].Name))
                 {
                         pValue = CcspManagementServer_CloneString(ProvisioningCode);
                 }
-				
+
 
             }
 
             if ( pValue && pValue[0] != '\0' )
             {
                  SlapAllocVariable(pSlapValue);
-                  
+
                  if ( pSlapValue )
                  {
-            	        pSlapValue->Syntax = SLAP_VAR_SYNTAX_string;
+                        pSlapValue->Syntax = SLAP_VAR_SYNTAX_string;
                         pSlapValue->Variant.varString = pValue;
-    	                pCwmpParamValueArray[i].Value = pSlapValue;
-                        pCwmpParamValueArray[i].Tr069DataType = 
+                        pCwmpParamValueArray[i].Value = pSlapValue;
+                        pCwmpParamValueArray[i].Tr069DataType =
                             pCcspCwmpCpeController->GetParamDataType
                             (
-                                (ANSC_HANDLE)pCcspCwmpCpeController, 
+                                (ANSC_HANDLE)pCcspCwmpCpeController,
                                 pCwmpParamValueArray[i].Name
                              );
                         pValue = NULL;
@@ -834,10 +834,10 @@ bFirstInform = 0;
     SlapAllocVariable(pSlapValue);
     if ( pSlapValue )
     {
-        char*			    pValue = NULL;
-        BOOL			    bValue = FALSE;
+        char*               pValue = NULL;
+        BOOL                bValue = FALSE;
         char*                       pPName = NULL;
-            
+
         pPName  =  bIGD ? "InternetGatewayDevice.ManagementServer.AliasBasedAddressing" :
             "Device.ManagementServer.AliasBasedAddressing";
 
@@ -859,24 +859,24 @@ bFirstInform = 0;
         {
             pCwmpParamValueArray[ulParamIndex].Name  = CcspTr069PaCloneString(pPName);
 
-	        pCcspCwmpCpeController->GetParamStringValue
-    	       (
-        	    (ANSC_HANDLE)pCcspCwmpCpeController,
-            	pCwmpParamValueArray[ulParamIndex].Name,
-	            &pValue
-    	       );
+            pCcspCwmpCpeController->GetParamStringValue
+               (
+                (ANSC_HANDLE)pCcspCwmpCpeController,
+                pCwmpParamValueArray[ulParamIndex].Name,
+                &pValue
+               );
 
-		    if ( pValue )
-		    {
-			    bValue = 
-				    !(AnscEqualString(pValue, "0", TRUE) || AnscEqualString(pValue, "false", FALSE)) ||
+            if ( pValue )
+            {
+                bValue =
+                    !(AnscEqualString(pValue, "0", TRUE) || AnscEqualString(pValue, "false", FALSE)) ||
                     AnscEqualString(pValue, "TRUE", FALSE);
-		    }
+            }
 
             pSlapValue->Syntax = SLAP_VAR_SYNTAX_string;
             pSlapValue->Variant.varString = bValue ? AnscCloneString("1") : AnscCloneString("0");
             pCwmpParamValueArray[ulParamIndex].Value = pSlapValue;
-		    pCwmpParamValueArray[ulParamIndex].Tr069DataType = CCSP_CWMP_TR069_DATA_TYPE_Boolean;
+            pCwmpParamValueArray[ulParamIndex].Tr069DataType = CCSP_CWMP_TR069_DATA_TYPE_Boolean;
 
             ulParamIndex++;
             pSlapValue = NULL; /*RDKB-7326, CID-33388, Once Assigned making pSlapValue NULL*/
@@ -895,8 +895,8 @@ bFirstInform = 0;
     {
         char*                       pDefWanConnection     = NULL;
         char*                       pDefWanConnIfIpv4Addr = NULL;
-        char*			    pConnReqUrl           = NULL;
-            
+        char*               pConnReqUrl           = NULL;
+
         pDefWanConnection = CcspManagementServer_GetFirstUpstreamIpAddress(pCcspCwmpCpeController->PANameWithPrefix);
         if ( pDefWanConnection )
         {
@@ -913,41 +913,41 @@ bFirstInform = 0;
                     break;
                 }
             }
-            
+
             if ( j >= ulParamIndex )
             {
-			pConnReqUrl = CcspManagementServer_GetConnectionRequestURL(pCcspCwmpCpeController->PANameWithPrefix);
-			if ( pConnReqUrl )
-			{
-				char*				pDomain = NULL;
-				char*				pDomainEnd = NULL;
+            pConnReqUrl = CcspManagementServer_GetConnectionRequestURL(pCcspCwmpCpeController->PANameWithPrefix);
+            if ( pConnReqUrl )
+            {
+                char*				pDomain = NULL;
+                char*				pDomainEnd = NULL;
 
-				/* parse Connection Request URL to get the default WAN connection interface IP address */
-				pDomain = _ansc_strstr(pConnReqUrl, "://");
-			
-				if ( pDomain ) 
-				{
-					char*			pPort = NULL;
+                /* parse Connection Request URL to get the default WAN connection interface IP address */
+                pDomain = _ansc_strstr(pConnReqUrl, "://");
 
-					pDomain += 3;
+                if ( pDomain )
+                {
+                    char*			pPort = NULL;
 
-					pPort = _ansc_strstr(pDomain, ":");
-					pDomainEnd = _ansc_strstr(pDomain, "/");
-					if ( !pDomainEnd && !pPort ) pDomainEnd = pDomain + AnscSizeOfString(pDomain);
-					else if ( !pDomainEnd ) pDomainEnd = pPort;
-					else if ( pPort < pDomainEnd ) pDomainEnd = pPort;
-					
-					pDefWanConnIfIpv4Addr = (char*)CcspTr069PaAllocateMemory(pDomainEnd - pDomain + 1);
-					if ( pDefWanConnIfIpv4Addr )
-					{
-						AnscCopyMemory(pDefWanConnIfIpv4Addr, pDomain, pDomainEnd - pDomain);
-						pDefWanConnIfIpv4Addr[pDomainEnd - pDomain] = 0;
-					}
-				}
+                    pDomain += 3;
+
+                    pPort = _ansc_strstr(pDomain, ":");
+                    pDomainEnd = _ansc_strstr(pDomain, "/");
+                    if ( !pDomainEnd && !pPort ) pDomainEnd = pDomain + AnscSizeOfString(pDomain);
+                    else if ( !pDomainEnd ) pDomainEnd = pPort;
+                    else if ( pPort < pDomainEnd ) pDomainEnd = pPort;
+
+                    pDefWanConnIfIpv4Addr = (char*)CcspTr069PaAllocateMemory(pDomainEnd - pDomain + 1);
+                    if ( pDefWanConnIfIpv4Addr )
+                    {
+                        AnscCopyMemory(pDefWanConnIfIpv4Addr, pDomain, pDomainEnd - pDomain);
+                        pDefWanConnIfIpv4Addr[pDomainEnd - pDomain] = 0;
+                    }
+                }
 
                 pCwmpParamValueArray[ulParamIndex].Name  = AnscCloneString(pDefWanConnection);
 
-			    SlapAllocVariable(pSlapValue);
+                SlapAllocVariable(pSlapValue);
 
                 if ( pSlapValue )
                 {
@@ -964,17 +964,17 @@ bFirstInform = 0;
                     CcspTr069PaFreeMemory(pDefWanConnIfIpv4Addr);/*RDKB-7326, CID-33309, free if not used*/
                     pDefWanConnIfIpv4Addr = NULL;
                 }
-				 ulParamIndex++;
+                 ulParamIndex++;
 
-                 CcspTr069PaFreeMemory(pConnReqUrl); 
+                 CcspTr069PaFreeMemory(pConnReqUrl);
                  pConnReqUrl = NULL;
-			}
             }
-            
-            CcspTr069PaFreeMemory(pDefWanConnection);			
+            }
+
+            CcspTr069PaFreeMemory(pDefWanConnection);
             pDefWanConnection = NULL;
         }
-	}
+    }
 
     /* get undelivered event codes only on the first try */
     if ( pMyObject->RetryCount == 0 && !bInitialContact )
@@ -1001,7 +1001,7 @@ bFirstInform = 0;
     else
     {
         CcspTr069PaTraceDebug(("CcspCwmpsoInform -- Start to build the soap message.\n"));
-		int x = 0;
+        int x = 0;
         AnscZeroMemory(request_id, 16);
         _ansc_itoa    (pMyObject->GlobalRequestID++, request_id, 10);
 
@@ -1009,17 +1009,17 @@ bFirstInform = 0;
         pWmpsoAsyncReq->Method       = CCSP_CWMP_METHOD_Inform;
         pWmpsoAsyncReq->MethodName   = CcspTr069PaCloneString("Inform");
         pWmpsoAsyncReq->RequestID    = CcspTr069PaCloneString(request_id);
-		 for(x = 0;x<ulParamIndex;x++)
-		 {
-			char *temp = NULL;
-			temp = (char *)malloc(sizeof(char)*(strlen(pCwmpParamValueArray[x].Name) + 1)); // Need to Account for '\0'
-			strcpy(temp,pCwmpParamValueArray[x].Name);
-			CcspCwmppoMpaMapParamInstNumDmIntToCwmp(temp);
-			pCwmpParamValueArray[x].Name = CcspTr069PaCloneString(temp);
-			free(temp);
-		 }
+         for(x = 0;x<ulParamIndex;x++)
+         {
+            char *temp = NULL;
+            temp = (char *)malloc(sizeof(char)*(strlen(pCwmpParamValueArray[x].Name) + 1)); // Need to Account for '\0'
+            strcpy(temp,pCwmpParamValueArray[x].Name);
+            CcspCwmppoMpaMapParamInstNumDmIntToCwmp(temp);
+            pCwmpParamValueArray[x].Name = CcspTr069PaCloneString(temp);
+            free(temp);
+         }
 
-		
+
         pWmpsoAsyncReq->SoapEnvelope =
             pCcspCwmpSoapParser->BuildSoapReq_Inform
                 (
@@ -1114,7 +1114,7 @@ bFirstInform = 0;
 
         if ( pCwmpSoapResponse )
         {
-			
+
                  pMyObject->AcsMaxEnvelopes = (ULONG)pCwmpSoapResponse->hRepArguments;
 
                 /*
@@ -1129,9 +1129,9 @@ bFirstInform = 0;
 
                 pMyObject->SessionState = CCSP_CWMPSO_SESSION_STATE_informed;
 
-                /* 
+                /*
                  * TODO: we need to acquire session lock from CR if necessary
-                 */ 
+                 */
                 returnStatus = ANSC_STATUS_SUCCESS;
 
                 if ( returnStatus != ANSC_STATUS_SUCCESS )
@@ -1150,7 +1150,7 @@ bFirstInform = 0;
                     );
 
                 /*
-                 *  Record the time of InformResponse 
+                 *  Record the time of InformResponse
                  */
                 if( pCcspCwmpCpeController != NULL)
                 {
@@ -1169,52 +1169,53 @@ bFirstInform = 0;
 
                 if( pCcspCwmpProcessor->GetInitialContact(pCcspCwmpProcessor))
                 {
-			        pCcspCwmpProcessor->SetInitialContact((ANSC_HANDLE)pCcspCwmpProcessor, FALSE);
+                    pCcspCwmpProcessor->SetInitialContact((ANSC_HANDLE)pCcspCwmpProcessor, FALSE);
                     CcspTr069PaTraceDebug(("Set 'InitialContact' to FALSE.\n"));
 
                     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->NotifyEvent )
                     {
                         if ( pCcspCwmpProcessor->GetInitialContactFactory(pCcspCwmpProcessor) )
                         {
-			     //Custom
-			     CcspCwmpsoInformCustom(pCcspCwmpCfgIf);
+                 //Custom
+                 CcspCwmpsoInformCustom(pCcspCwmpCfgIf);
                             pCcspCwmpProcessor->SetInitialContactFactory((ANSC_HANDLE)pCcspCwmpProcessor, FALSE);
                         }
                         else
                         {
                             pCcspCwmpCfgIf->NotifyEvent(pCcspCwmpCfgIf->hOwnerContext, CCSP_CWMP_CFG_EVENT_CODE_BootstrapInformed);
                         }
-                        
+
                         pCcspCwmpCfgIf->NotifyEvent(pCcspCwmpCfgIf->hOwnerContext, CCSP_CWMP_CFG_EVENT_CODE_BootInformed);
                     }
                 }
                 else
                 {
-			if(tlvFileFlag == 0)
-			{				
-				tlvFileFlag = 1;
-				FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
-				Tr69TlvData *object=malloc(sizeof(Tr69TlvData));
-				if (file != NULL) 
-				{
-					fread(object, sizeof(Tr69TlvData), 1, file);
-					fclose(file);					
-				}				
+            if(tlvFileFlag == 0)
+            {
+                tlvFileFlag = 1;
+                FILE * file= fopen(TR69_TLVDATA_FILE, "rb");
+                Tr69TlvData *object=malloc(sizeof(Tr69TlvData));
+                if (file != NULL)
+                {
+                    fread(object, sizeof(Tr69TlvData), 1, file);
+                    fclose(file);
+                }
 
-				if (object->Tr69Enable == 0)
-				{
-					file= fopen(TR69_TLVDATA_FILE, "wb");
-					if (file != NULL) 
-					{
-						fseek(file, 0, SEEK_SET);			
-						object->Tr69Enable = 1;
-						fwrite(object, sizeof(Tr69TlvData), 1, file);
-						fclose(file);						
-					}
-				}
-				free(object);
-			}
-			
+                if (object->Tr69Enable == 0)
+                {
+                    file= fopen(TR69_TLVDATA_FILE, "wb");
+                    if (file != NULL)
+                    {
+                        fseek(file, 0, SEEK_SET);
+                        object->Tr69Enable = 1;
+                        fwrite(object, sizeof(Tr69TlvData), 1, file);
+                        fclose(file);
+                    }
+
+                }
+                free(object);
+            }
+
                     if ( pCcspCwmpCfgIf && pCcspCwmpCfgIf->NotifyEvent )
                     {
                         BOOL                bHasBootEvent = FALSE;
@@ -1232,9 +1233,9 @@ bFirstInform = 0;
                                 bHasBootEvent = TRUE;
                                 break;
                             }
-                            
-			     //Custom
-			     CcspCwmpsoInformCustom1(pCwmpEvent,pCcspCwmpCfgIf);
+
+                 //Custom
+                 CcspCwmpsoInformCustom1(pCwmpEvent,pCcspCwmpCfgIf);
                         }
 
                         if ( bHasBootEvent )
@@ -1346,8 +1347,8 @@ EXIT1:
                 This handle is actually the pointer of this object
                 itself.
 
-				BOOL						bIsDownload,
-				It's Download or upload;
+                BOOL						bIsDownload,
+                It's Download or upload;
 
                 char*                       pCommandKey
                 Specifies the CommandKey argument passed to CPE in the
@@ -1380,7 +1381,7 @@ ANSC_STATUS
 CcspCwmpsoTransferComplete
     (
         ANSC_HANDLE                 hThisObject,
-		BOOL						bIsDownload,
+        BOOL						bIsDownload,
         char*                       pCommandKey,
         ANSC_HANDLE                 hFault,
         ANSC_HANDLE                 hStartTime,
@@ -1432,14 +1433,14 @@ CcspCwmpsoTransferComplete
             return  ANSC_STATUS_RESOURCES;
         }
 
-		if( bIsDownload)
-		{
-	        pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_Download);
-		}
-		else
-		{
-	        pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_Upload);
-		}
+        if( bIsDownload)
+        {
+            pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_Download);
+        }
+        else
+        {
+            pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_Upload);
+        }
 
         pCcspCwmpEvent->CommandKey = CcspTr069PaCloneString(pCommandKey);
 
@@ -1598,10 +1599,10 @@ EXIT1:
         CcspCwmpsoAutonomousTransferComplete
             (
                 ANSC_HANDLE                 hThisObject,
-		        BOOL						bIsDownload,
-                ANSC_HANDLE                 hFault,             
-                ANSC_HANDLE                 hStartTime,         
-                ANSC_HANDLE                 hCompleteTime,      
+                BOOL						bIsDownload,
+                ANSC_HANDLE                 hFault,
+                ANSC_HANDLE                 hStartTime,
+                ANSC_HANDLE                 hCompleteTime,
                 char*                       AnnounceURL,
                 char*                       TransferURL,
                 char*                       FileType,
@@ -1620,8 +1621,8 @@ EXIT1:
                 This handle is actually the pointer of this object
                 itself.
 
-				BOOL						bIsDownload,
-				It's Download or upload;
+                BOOL						bIsDownload,
+                It's Download or upload;
 
                 ANSC_HANDLE                 hFault
                 If the transfer was successful, the FaultCode is set to
@@ -1664,10 +1665,10 @@ ANSC_STATUS
 CcspCwmpsoAutonomousTransferComplete
     (
         ANSC_HANDLE                 hThisObject,
-		BOOL						bIsDownload,
-        ANSC_HANDLE                 hFault,             
-        ANSC_HANDLE                 hStartTime,         
-        ANSC_HANDLE                 hCompleteTime,      
+        BOOL						bIsDownload,
+        ANSC_HANDLE                 hFault,
+        ANSC_HANDLE                 hStartTime,
+        ANSC_HANDLE                 hCompleteTime,
         char*                       AnnounceURL,
         char*                       TransferURL,
         char*                       FileType,
@@ -2356,7 +2357,7 @@ CcspCwmpsoDUStateChangeComplete
             return  ANSC_STATUS_RESOURCES;
         }
 
-	    pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_ChangeDUState);
+        pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_M_ChangeDUState);
 
         pCcspCwmpEvent->CommandKey = CcspTr069PaCloneString(pCommandKey);
 
@@ -2376,7 +2377,7 @@ CcspCwmpsoDUStateChangeComplete
         }
 
         pCcspCwmpEvent->EventCode  = CcspTr069PaCloneString(CCSP_CWMP_INFORM_EVENT_NAME_DUStateChangeComplete);
-        pCcspCwmpEvent->CommandKey = NULL; 
+        pCcspCwmpEvent->CommandKey = NULL;
 
         if ( ( pCcspCwmpCpeController->bBootInformScheduled || pCcspCwmpCpeController->bBootstrapInformScheduled ) &&
              !pCcspCwmpCpeController->bDelayedInformCancelled )
@@ -2715,5 +2716,3 @@ EXIT1:
 
     return  returnStatus;
 }
-
-
